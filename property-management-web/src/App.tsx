@@ -1,4 +1,3 @@
-import { Box, Paper, Typography } from '@mui/material';
 import { Navigate, Route, Routes } from 'react-router';
 import PlaceholderPage from './PlaceholderPage';
 import AppLayout from './layouts/AppLayout';
