@@ -1,17 +1,44 @@
 import { Box, Paper, Typography } from '@mui/material';
+import { Navigate, Route, Routes } from 'react-router';
+import PlaceholderPage from './PlaceholderPage';
+import AppLayout from './layouts/AppLayout';
 
 const App = () => {
   return (
-    <Box sx={{ p: 4 }}>
-      <Paper variant='outlined' sx={{ p: 3 }}>
-        <Typography variant='h5' sx={{ fontWeight: 600 }} gutterBottom>
-          Property Management
-        </Typography>
-        <Typography color='text.secondary'>
-          Manage your properties and farming seasons
-        </Typography>
-      </Paper>
-    </Box>
+    <Routes>
+      <Route path='/login' element={<PlaceholderPage title='Login' />} />
+      <Route
+        path='/reset-password'
+        element={<PlaceholderPage title='Reset Password' />}
+      />
+
+      <Route element={<AppLayout />}>
+        <Route index element={<Navigate to='/dashboard' replace />} />
+        <Route
+          path='/dashboard'
+          element={<PlaceholderPage title='Dashboard' />}
+        />
+        <Route
+          path='/properties'
+          element={<PlaceholderPage title='Properties' />}
+        />
+        <Route
+          path='/properties/:propertyId'
+          element={<PlaceholderPage title='Property Details' />}
+        />
+        <Route path='/seasons' element={<PlaceholderPage title='Seasons' />} />
+        <Route
+          path='/investors'
+          element={<PlaceholderPage title='Investors' />}
+        />
+        <Route path='/reports' element={<PlaceholderPage title='Reports' />} />
+        <Route
+          path='/my-account'
+          element={<PlaceholderPage title='My Account' />}
+        />
+        <Route path='*' element={<PlaceholderPage title='Page Not Found' />} />
+      </Route>
+    </Routes>
   );
 };
 
