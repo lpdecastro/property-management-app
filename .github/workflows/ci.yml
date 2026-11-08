@@ -1,0 +1,92 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  backend:
+    name: Backend
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    defaults:
+      run:
+        working-directory: property-management-api
+
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_DB: property_management
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: password
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d property_management"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      DB_PASSWORD: password
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v5
+
+      - name: Set up Java
+        uses: actions/setup-java@5
+        with:
+          distribution: temurin
+          java-veresion: '21'
+          cache: maven
+          cache-dependency-path: property-management-api/pom.xml
+
+      - name: Allow Maven wrapper execution
+        run: chmod +x mvnw
+
+      - name: Build and test
+        run: ./mvnw --batch-mode --no-transfer-progress verify
+
+  frontend:
+    name: Frontend
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    defaults:
+      run:
+        working-directory: property-management-web
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v5
+
+      - name: Set up Node
+        uses: actions/setup-node@v6
+        with:
+          node-version: '22.22.2'
+          cache: npm
+          cache-dependency-path: property-management-web/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Test
+        run: npm run test:run
+
+      - name: Build
+        run: npm run build
